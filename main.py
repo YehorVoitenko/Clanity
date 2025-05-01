@@ -8,17 +8,16 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile
 
 from config.storage_service_config import MINIO_BUCKET_NAME
-from constants.enums import StateKeys, FileTypes
-from processors.database_processors import UserDBProcessor
-from services.bot_services.bot_initializer import initialize_bot, dispatcher
-from services.bot_services.buttons import ButtonOrchestrator
-from services.database import init_tables, get_database_session
+from constants.enums import StateKeys
 from constants.phrases import InteractivePhrases
 from processors.bot_processors import QuizProcessor
-from services.bot_services.states import AvailableStates
-from services.storage_service import storage_client
-
+from processors.database_processors import UserDBProcessor
 from processors.storage_service_processor import StorageServiceProcessor
+from services.bot_services.bot_initializer import initialize_bot, dispatcher
+from services.bot_services.buttons import ButtonOrchestrator
+from services.bot_services.states import AvailableStates
+from services.database import init_tables, get_database_session
+from services.storage_service import storage_client
 
 
 @dispatcher.message(CommandStart())
@@ -62,6 +61,7 @@ async def instruction_cmd(message: Message):
     )
     await message.answer_document(document=sample_file)
 
+
 @dispatcher.callback_query(F.data == 'start_quiz_with_new_file')
 async def start_quiz_with_new_file(callback, state: FSMContext):
     await QuizProcessor.ask_user_to_send_file(message=callback.message)
@@ -72,6 +72,7 @@ async def start_quiz_with_new_file(callback, state: FSMContext):
 async def start_quiz_with_previous_file(callback, state: FSMContext):
     await callback.message.answer(InteractivePhrases.SUCCESS_GET_PREVIOUS_FILE.value)
 
+    file_response = None
     try:
         file_response = storage_client.get_object(
             bucket_name=MINIO_BUCKET_NAME,
@@ -79,9 +80,16 @@ async def start_quiz_with_previous_file(callback, state: FSMContext):
         )
         file_data_in_bytes: bytes = file_response.read()
 
+    except Exception as e:
+        await callback.message.answer(InteractivePhrases.EMPTY_FILE.value)
+        print(f'\nUSER BUG. USER ID {message.from_user.id}')
+        print(str(e), '\n')
+        return
+
     finally:
-        file_response.close()
-        file_response.release_conn()
+        if file_response:
+            file_response.close()
+            file_response.release_conn()
 
     await state.update_data({StateKeys.UPLOADED_FILE_DATA.value: file_data_in_bytes})
 
@@ -124,5 +132,5 @@ async def handler_quiz_limit_input(message: Message, state: FSMContext):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     init_tables()
-    # StorageServiceProcessor.init_minio_bucket()
+    StorageServiceProcessor.init_minio_bucket()
     asyncio.run(initialize_bot())

@@ -87,6 +87,7 @@ class QuizProcessor:
             await message.answer(InteractivePhrases.EMPTY_FILE.value)
             print(f'\nUSER BUG. USER ID {message.from_user.id}')
             print(str(e), '\n')
+            return
 
         finally:
             if file_response:
