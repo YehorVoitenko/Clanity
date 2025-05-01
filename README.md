@@ -9,6 +9,8 @@ Clanity is an intelligent, file-based language learning Telegram bot built with 
 
 @ClanityBot
 
+https://linktr.ee/clanity
+
 ```
 
 </br>
