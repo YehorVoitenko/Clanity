@@ -3,9 +3,9 @@ import logging
 import sys
 
 from aiogram import F
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, FSInputFile
 
 from config.storage_service_config import MINIO_BUCKET_NAME
 from constants.enums import StateKeys, FileTypes
@@ -17,7 +17,6 @@ from constants.phrases import InteractivePhrases
 from processors.bot_processors import QuizProcessor
 from services.bot_services.states import AvailableStates
 from services.storage_service import storage_client
-
 
 from processors.storage_service_processor import StorageServiceProcessor
 
@@ -39,6 +38,29 @@ async def start_cmd(message: Message):
         reply_markup=ButtonOrchestrator.get_buttons_for_start()
     )
 
+
+@dispatcher.message(Command("instruction"))
+async def instruction_cmd(message: Message):
+    if message.from_user.is_bot:
+        return
+
+    instruction_text = (
+        "📖 *How to Use Clanity Bot*\n\n"
+        "1️⃣ Send me a `.xlsx` file with word translations.\n"
+        "2️⃣ Write translations for quiz words.\n\n"
+        "📂 Here's an example file to help you get started 👇"
+    )
+
+    await message.answer(
+        text=instruction_text,
+        parse_mode="Markdown"
+    )
+
+    sample_file = FSInputFile(
+        path="constants/files/example wile with words.xlsx",
+        filename="example wile with words.xlsx"
+    )
+    await message.answer_document(document=sample_file)
 
 @dispatcher.callback_query(F.data == 'start_quiz_with_new_file')
 async def start_quiz_with_new_file(callback, state: FSMContext):
@@ -74,6 +96,7 @@ async def handle_new_file_from_user(message: Message, state: FSMContext):
         state=state
     )
 
+
 @dispatcher.message(AvailableStates.awaiting_previous_file_upload)
 async def handle_previous_user_file(message: Message, state: FSMContext):
     await QuizProcessor.process_previous_user_file(
@@ -101,5 +124,5 @@ async def handler_quiz_limit_input(message: Message, state: FSMContext):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     init_tables()
-    StorageServiceProcessor.init_minio_bucket()
+    # StorageServiceProcessor.init_minio_bucket()
     asyncio.run(initialize_bot())
