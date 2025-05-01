@@ -82,7 +82,7 @@ async def start_quiz_with_previous_file(callback, state: FSMContext):
 
     except Exception as e:
         await callback.message.answer(InteractivePhrases.EMPTY_FILE.value)
-        print(f'\nUSER BUG. USER ID {message.from_user.id}')
+        print(f'\nUSER BUG. USER ID {callback.message.from_user.id}')
         print(str(e), '\n')
         return
 
