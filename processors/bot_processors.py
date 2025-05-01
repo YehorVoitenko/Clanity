@@ -16,6 +16,7 @@ from constants.common_constants import AVAILABLE_FILE_FORMATS
 from constants.enums import StateKeys
 from constants.phrases import InteractivePhrases
 from processors.database_processors import FileDBProcessor
+from services.bot_services.buttons import ButtonOrchestrator
 from services.bot_services.states import AvailableStates
 from services.database import get_database_session
 from services.storage_service import storage_client
@@ -202,8 +203,8 @@ class QuizProcessor:
             next_eng_word = quiz_data[index][0]
             await message.answer(
                 InteractivePhrases.CORRECT_USER_WORD.value.format(
-                    next_eng_word=next_eng_word
-                )
+                    next_eng_word=next_eng_word,
+                ),
             )
 
         else:
@@ -211,5 +212,5 @@ class QuizProcessor:
                 InteractivePhrases.INCORRECT_USER_WORD.value.format(
                     correct_answer=correct_answer,
                     next_word=current_pair[0]
-                )
+                ),
             )

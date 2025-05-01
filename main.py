@@ -8,6 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile
 
 from config.storage_service_config import MINIO_BUCKET_NAME
+from constants.common_constants import PATH_TO_INSTRUCTION_FILE, INSTRUCTION_FILE_NAME
 from constants.enums import StateKeys
 from constants.phrases import InteractivePhrases
 from processors.bot_processors import QuizProcessor
@@ -43,21 +44,14 @@ async def instruction_cmd(message: Message):
     if message.from_user.is_bot:
         return
 
-    instruction_text = (
-        "📖 *How to Use Clanity Bot*\n\n"
-        "1️⃣ Send me a `.xlsx` file with word translations.\n"
-        "2️⃣ Write translations for quiz words.\n\n"
-        "📂 Here's an example file to help you get started 👇"
-    )
-
     await message.answer(
-        text=instruction_text,
+        text=InteractivePhrases.INSTRUCTION.value,
         parse_mode="Markdown"
     )
 
     sample_file = FSInputFile(
-        path="constants/files/example wile with words.xlsx",
-        filename="example wile with words.xlsx"
+        path=PATH_TO_INSTRUCTION_FILE,
+        filename=INSTRUCTION_FILE_NAME
     )
     await message.answer_document(document=sample_file)
 
@@ -113,20 +107,28 @@ async def handle_previous_user_file(message: Message, state: FSMContext):
     )
 
 
-@dispatcher.message(AvailableStates.process_user_word_answer)
-async def process_user_word_answer(message: Message, state: FSMContext):
-    await QuizProcessor.process_user_answer(
-        message=message,
-        state=state
-    )
-
-
 @dispatcher.message(AvailableStates.awaiting_quiz_limit)
 async def handler_quiz_limit_input(message: Message, state: FSMContext):
     await QuizProcessor.handler_quiz_start(
         message=message,
         state=state
     )
+
+
+@dispatcher.message(AvailableStates.process_user_word_answer)
+async def handle_quiz_answer_or_stop(message: Message, state: FSMContext):
+    if not message.text:
+        return
+
+    if message.text.strip().lower() == "/stop_quiz":
+        await state.clear()
+        await message.answer(
+            text=InteractivePhrases.STOP_QUIZ.value,
+            reply_markup=ButtonOrchestrator.get_buttons_for_start()
+        )
+        return
+
+    await QuizProcessor.process_user_answer(message=message, state=state)
 
 
 if __name__ == "__main__":

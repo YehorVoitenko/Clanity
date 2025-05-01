@@ -15,3 +15,8 @@ class InteractivePhrases(Enum):
     WRONG_FILE_CONTENT_QUANTITY = "⚠️ The file only contains {len_of_pairs} entries, but you requested {limit}.\n I will use the full list instead."
     EMPTY_FILE = "❌ File not found. Please restart the quiz."
     SUCCESS_GET_PREVIOUS_FILE = "✅ Previous file was loaded from server"
+    STOP_QUIZ = "🛑 The quiz was stopped"
+    INSTRUCTION = """📖 *How to Use Clanity Bot*\n\n"
+        "1️⃣ Send me a `.xlsx` file with word translations.\n"
+        "2️⃣ Write translations for quiz words.\n\n"
+        "📂 Here's an example file to help you get started 👇"""
