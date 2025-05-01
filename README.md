@@ -1,13 +1,13 @@
 # 🧠 Clanity — Learn Languages with Smart Quizzes
 
-Clanity is an intelligent, file-based language learning Telegram bot built with Python and FastAPI. It helps users expand their vocabulary through interactive quizzes generated from user-uploaded documents.
+Clanity is an intelligent, file-based language learning Telegram bot built with Python. It helps users expand their vocabulary through interactive quizzes generated from user-uploaded documents.
 
 </br>
 
 ## 🔗 Exists "Clanity bot" Telegram link
 ```bash
 
-@MyWordsHelperBot
+@ClanityBot
 
 ```
 
@@ -24,8 +24,12 @@ Clanity is an intelligent, file-based language learning Telegram bot built with 
 </br>
 
 ## 📸 Screenshots
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/30e36d6e-4fc8-4d2b-9788-9b36288f137c" alt="screenshot 1" width="45%" />
+  <img src="https://github.com/user-attachments/assets/7bd3fd47-5cd0-465a-bb20-61d36ebab4ae" alt="screenshot 2" width="45%" />
+</p>
 
-*(Coming soon: Add Telegram bot screenshots here)*
+
 
 </br>
 
